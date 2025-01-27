@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/User.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const authenticateUser = require("../middlewares/auth.middleware");
 
 router.post("/signup", async (req, res) => {
   try {
@@ -32,31 +33,38 @@ try {
 
 
   const foundUser = await User.findOne({ email });
+  
   if (!foundUser) {
-    res.status(403).json({ message: "Invalid Credentials" });
+   return res.status(403).json({ message: "Invalid Credentials" });
   } 
 
-    const doesPasswordsMatch = bcryptjs.compareSync( password, foundUser.password);
-    if (doesPasswordsMatch) {
+  const doesPasswordsMatch = bcryptjs.compareSync( password, foundUser.password);
+   if (!doesPasswordsMatch) {
       return res.status(403).json({ message: "Wrong Credentials "});
-    } //stopped here
-      const data = { _id: foundUser._id, username: foundUser.username };
+    } 
+      
+    const data = { _id: foundUser._id, username: foundUser.username };
 
-      const authToken = jwt.sign(data, process.env.TOKEN_SECRET, {
+
+    const authToken = jwt.sign(data, process.env.TOKEN_SECRET, {
         algorithm: "HS256",
         expiresIn: "48h",
       });
+
+      console.log("I found user 2, ", authToken)
     
       console.log("Here is the AuthToken", authToken);
-      res.status(200).json({ message: "successful login", authToken });
-    } else {
-     res.status(403).json({ message: "Wrong Credentials" });
-    } 
+    return res.status(200).json({ message: "successful login", authToken });
+
+  } catch (error) {
+    console.error("Error logging in user:", error.message); 
+    return res.status(500).json({ message: "Error logging in the user" });
   }
-} catch (error) {
-  console.log(error);
-  res.status(500).json({ message: "Error logging in the user"});
-}
+});
+router.get("/verify", authenticateUser, async (req, res) => {
+  console.log("verify route", req.payload);
+
+  res.status(200).json({ message: "token is valid", currentUser: req.payload });
 });
 
 module.exports = router;
