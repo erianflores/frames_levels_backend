@@ -61,10 +61,10 @@ try {
     return res.status(500).json({ message: "Error logging in the user" });
   }
 });
-router.get("/verify", authenticateUser, async (req, res) => {
-  console.log("verify route", req.payload);
+   router.get("/verify", authenticateUser, async (req, res) => {
+   console.log("verify route", req.payload);
 
-  res.status(200).json({ message: "token is valid", currentUser: req.payload });
+   res.status(200).json({ message: "token is valid", currentUser: req.payload });
 });
 
 module.exports = router;
