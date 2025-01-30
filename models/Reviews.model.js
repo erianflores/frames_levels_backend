@@ -6,7 +6,6 @@ const reviewsSchema = new Schema(
         username: {
             type: String,
             required: true,
-            unique: true,
         },
         body: {
           type: String,
@@ -17,6 +16,10 @@ const reviewsSchema = new Schema(
             required: true,
             min: 1,
             max: 5,
+        },
+        gameTitle: {
+            type: String,
+            required: true,
         }
     },
     {

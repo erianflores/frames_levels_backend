@@ -7,7 +7,7 @@ const authenticateUser = (req, res, next) => {
       req.headers.authorization &&
       req.headers.authorization.split(" ")[0] === "Bearer"
     ) {
-      n
+      
       const theToken = req.headers.authorization.split(" ")[1];
 
       
