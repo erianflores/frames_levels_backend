@@ -1,4 +1,6 @@
 const fetch = require("node-fetch");
+const axios = require("axios");
+const Game = require("../models/Games.model");
 
 const API_KEY = "3056b63565b048a8806c8fe125237952";
 const BASE_URL = `https://api.rawg.io/api`;
@@ -32,8 +34,22 @@ const fetchGames = async (filters) => {
       nextPageUrl = data.next;
 
       if (allGames.length > 500) {
-        console.log("Reached limit of 1000 games.");
+        console.log("Reached limit of 500 games.");
         break;
+      }
+    }
+
+    //Insert fetched games into the database
+
+    for (let gameData of allGames) {
+      const existingGame = await Game.findOne({ id: gameData.id });
+
+      if (!existingGame) {
+        const newGame = new Game(gameData);
+        await newGame.save();
+        console.log(`New game added: ${gameData.name}`);
+      } else {
+        console.log(`Game already exists: ${gameData.name}`);
       }
     }
 
