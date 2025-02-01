@@ -1,7 +1,7 @@
 const authRoutes = require("./routes/user.routes");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
+
 
 // ℹ️ Gets access to environment variables/settings
 // https://www.npmjs.com/package/dotenv
@@ -23,10 +23,13 @@ require("./config")(app);
 const indexRoutes = require("./routes/index.routes");
 const gamesRoutes = require("./routes/games.routes");
 const reviewRoutes = require("./routes/reviews.routes");
+const userRoutes = require("./routes/user.routes");
 
 app.use("/api/games", gamesRoutes);
 app.use("/api/index", indexRoutes);
 app.use("/reviews", reviewRoutes);
+console.log("userRoutes loaded!")
+app.use("/users", userRoutes);
 
 app.use("/auth", authRoutes);
 
