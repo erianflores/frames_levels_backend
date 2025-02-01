@@ -5,6 +5,8 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authenticateUser = require("../middlewares/auth.middleware");
 
+
+//sign up a user
 router.post("/signup", async (req, res) => {
   try {
     const salt = bcryptjs.genSaltSync(12);
@@ -24,6 +26,8 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+
+//login a user
 router.post("/login", async (req, res) => {
 try {
   const { email, password } = req.body;
@@ -61,6 +65,61 @@ try {
     return res.status(500).json({ message: "Error logging in the user" });
   }
 });
+
+// update a user by their ID
+
+router.put("/update", authenticateUser, async (req, res) => {
+  console.log("UPDATE route hit!")
+  try {
+
+    const userId = req.payload._id;
+    console.log("User ID from token:", userId)
+    const { email, username, password } = req.body;
+    
+
+    const user = await User.findById(userId);
+    console.log("User found:", user);
+    if(!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (email) user.email = email;
+    if (username) user.username = username;
+    if (password) user.password = await bcryptjs.hash(password, 10);
+
+    await user.save();
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// delete a user 
+
+router.delete("/delete", authenticateUser, async (req, res) => {
+  try {
+    const userId = req.payload._id;
+    console.log("User ID from token:", userId);
+
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await User.findByIdAndDelete(userId);
+    console.log("User deleted:", userId);
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user", error.message);
+    res.status(500).json({ message: "Error deleting the user "})
+  }
+});
+
+//verify a user
    router.get("/verify", authenticateUser, async (req, res) => {
    console.log("verify route", req.payload);
 
