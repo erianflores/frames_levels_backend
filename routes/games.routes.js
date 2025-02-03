@@ -31,4 +31,15 @@ router.get("/fetch-games", async (req, res) => {
   }
 });
 
+// Route to fetch 10 random featured games from Mongodb
+router.get("/featured", async (req, res) => {
+  console.log("/featured route hit");
+  try {
+    const featuredGames = await Game.aggregate([{$sample: { size: 10 } }]);
+    res.json(featuredGames);
+  } catch (error) {
+    console.error("Error fetching featured games:", error.message);
+  }
+});
+
 module.exports = router;
