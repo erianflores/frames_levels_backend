@@ -3,9 +3,10 @@ const { Schema, model } = require("mongoose");
 
 const reviewsSchema = new Schema(
     {
-        username: {
-            type: String,
+        user: {
+            type: Schema.Types.ObjectId,
             required: true,
+            ref: "User",
         },
         body: {
           type: String,
@@ -22,8 +23,9 @@ const reviewsSchema = new Schema(
             required: true,
         },
         gameId: {
-            type: Number,
-            required: true
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: "Game",
         },
     },
     {
