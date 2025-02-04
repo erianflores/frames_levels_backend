@@ -20,7 +20,11 @@ const reviewsSchema = new Schema(
         gameTitle: {
             type: String,
             required: true,
-        }
+        },
+        gameId: {
+            type: Number,
+            required: true
+        },
     },
     {
         timestamps: true,

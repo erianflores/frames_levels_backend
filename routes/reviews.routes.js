@@ -7,11 +7,20 @@ const mongoose = require("mongoose");
 //create a review
 router.post("/", authenticateUser, async (req, res) => {
     try {
-        const { gameTitle, body, rating } = req.body;
+        console.log("Review received:", req.body);
+        console.log("User submitting review:", req.payload);
+
+        const { gameTitle, gameId, body, rating } = req.body;
         const username = req.payload.username;
 
-        const newReview = new Review({ username, gameTitle, body, rating });
+        if (!gameTitle || !body || !rating || !gameId) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const newReview = new Review({ username, gameTitle, body, rating, gameId });
         await newReview.save();
+
+        console.log("Review successfully stored in MongoDB:", newReview)
 
         res.status(201).json({ message: "Review created Successfully", review: newReview });
     } catch (error) {
@@ -30,20 +39,25 @@ router.get("/", async (req, res) => {
 });
 
 // read a review depending on the game title
-router.get("/game/:gameTitle", async (req, res) => {
+router.get("/game/:id", async (req, res) => {
     try {
-        const { gameTitle } = req.params;
+        
+        const id  = req.params.id ;  
+        console.log("game id is : ", id)    
+        console.log(id)
 
-        const reviews = await Review.find({ gameTitle: new RegExp(gameTitle, "i")});
+        const reviews = await Review.find({ gameId: id });
 
         if (reviews.length === 0) {
             return res.status(404).json({ message: "No reviews found for this game" });
         }
+
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // update a review by its ID
 router.put("/:id", authenticateUser, async (req, res) => {

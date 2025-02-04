@@ -42,4 +42,20 @@ router.get("/featured", async (req, res) => {
   }
 });
 
+// Route to fetch details of a single game by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const game = await Game.findOne({ id: req.params.id });
+
+    if (!game) {
+      return res.status(404).json({ message: "Game not found" });
+    }
+
+    res.json(game);
+  } catch (error) {
+    console.error("Error fetching game details:", error.message);
+    res.status(500).json({ message: "Error fetching game details" });
+  }
+});
+
 module.exports = router;

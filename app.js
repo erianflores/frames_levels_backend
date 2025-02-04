@@ -30,10 +30,9 @@ const userRoutes = require("./routes/user.routes");
 
 app.use("/api/games", gamesRoutes);
 app.use("/api/index", indexRoutes);
-app.use("/reviews", reviewRoutes);
 console.log("userRoutes loaded!")
 app.use("/users", userRoutes);
-
+app.use("/api/reviews", reviewRoutes);
 app.use("/auth", authRoutes);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
