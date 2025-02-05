@@ -42,6 +42,42 @@ router.get("/featured", async (req, res) => {
   }
 });
 
+
+
+router.get("/top-games", async (req, res) => {
+  console.log("Fetching top-rated games with IDs:"); 
+    try {
+        const topRatedGameIds = [3328, 5286, 12020, 5679]; 
+        let topGames = [];
+
+        console.log("Fetching top-rated games with IDs:", topRatedGameIds);
+
+        
+        for (let gameId of topRatedGameIds) {
+            console.log("Fetching game with ID:", gameId);  
+            const game = await Game.findOne({ id: Number(gameId) });
+
+            if (game) {
+                topGames.push(game);
+            } else {
+                console.log(`Game with ID ${gameId} not found.`);
+            }
+        }
+
+        console.log("Fetched Games:", topGames); 
+
+        if (topGames.length === 0) {
+            return res.status(404).json({ message: "No top-rated games found" });
+        }
+
+        
+        res.status(200).json(topGames);
+    } catch (error) {
+        console.error("Error fetching top-rated games:", error);
+        res.status(500).json({ error: "Failed to fetch top-rated games" });
+    }
+});
+
 // Route to fetch details of a single game by ID
 router.get("/:id", async (req, res) => {
   try {
