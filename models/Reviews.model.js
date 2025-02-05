@@ -8,6 +8,10 @@ const reviewsSchema = new Schema(
             required: true,
             ref: "User",
         },
+        username: { 
+            type: String, 
+            default: "Anonymous" 
+        },
         body: {
           type: String,
           required: true,

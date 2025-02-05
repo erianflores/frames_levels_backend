@@ -12,12 +12,19 @@ router.post("/", authenticateUser, async (req, res) => {
 
         const { gameTitle, gameId, body, rating } = req.body;
         const userId = req.payload._id;
+        const username = req.payload?.username || "Anonymous";
 
         if (!gameTitle || !body || !rating || !gameId) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const newReview = new Review({ user: userId, gameTitle, body, rating, gameId });
+        const newReview = new Review({ user: userId,
+                                             username, 
+                                             gameTitle, 
+                                             body, 
+                                             rating, 
+                                             gameId 
+                                            });
         await newReview.save();
 
         console.log("Review successfully stored in MongoDB:", newReview)
@@ -32,7 +39,7 @@ router.post("/", authenticateUser, async (req, res) => {
 // to read all reviews
 router.get("/", async (req, res) => {
     try {
-        const reviews = await Review.find();
+        const reviews = await Review.find({ gameId: id }).select("username body rating");
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ error: error.message });
