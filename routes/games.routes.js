@@ -96,7 +96,7 @@ router.get("/search", async (req, res) => {
 // Route to fetch details of a single game by ID
 router.get("/:id", async (req, res) => {
   try {
-    const game = await Game.findOne({ id: req.params.id });
+    const game = await Game.findById(req.params.id);
 
     if (!game) {
       return res.status(404).json({ message: "Game not found" });
