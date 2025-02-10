@@ -1,4 +1,5 @@
 const express = require("express");
+const User = require("../models/User.model")
 const Review = require("../models/Reviews.model");
 const router = express.Router();
 const authenticateUser = require("../middlewares/auth.middleware");
