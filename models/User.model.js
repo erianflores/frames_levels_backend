@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const Review = require("./Reviews.model");
 
 // TODO: Please make sure you edit the User model to whatever makes sense in this case
 const userSchema = new Schema(
@@ -19,6 +20,12 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required."],
     },
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

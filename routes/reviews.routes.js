@@ -28,6 +28,10 @@ router.post("/", authenticateUser, async (req, res) => {
     });
     await newReview.save();
 
+    await User.findByIdAndUpdate(userId, {
+      $push: { reviews: newReview._id }, 
+    });
+
     console.log("Review successfully stored in MongoDB:", newReview);
 
     res

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User.model");
+const Review = require("../models/Reviews.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authenticateUser = require("../middlewares/auth.middleware");
@@ -124,6 +125,32 @@ router.delete("/delete", authenticateUser, async (req, res) => {
    console.log("verify route", req.payload);
 
    res.status(200).json({ message: "token is valid", currentUser: req.payload });
+});
+
+// Profile route
+router.get("/profile/:userId", authenticateUser, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Fetch the reviews for the user
+    const reviews = await Review.find({ user: userId }).populate("user", "username");
+    console.log("Fetched reviews:", reviews);
+
+    // Filter out reviews with the 'Anonymous' username
+    const filteredReviews = reviews.filter(review => review.username !== 'Anonymous');
+    console.log("Filtered reviews:", filteredReviews);
+
+    if (filteredReviews.length === 0) {
+      return res.status(404).json({ message: "No reviews found" });
+    }
+
+    // Return the filtered reviews to the frontend
+    res.status(200).json(filteredReviews);
+
+  } catch (error) {
+    console.error("Error fetching profile:", error.message);
+    res.status(500).json({ message: "Error fetching profile data" });
+  }
 });
 
 module.exports = router;
