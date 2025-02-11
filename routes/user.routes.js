@@ -121,7 +121,7 @@ router.delete("/delete", authenticateUser, async (req, res) => {
 });
 
 //verify a user
-   router.get("/verify", authenticateUser, async (req, res) => {
+router.get("/verify", authenticateUser, async (req, res) => {
    console.log("verify route", req.payload);
 
    res.status(200).json({ message: "token is valid", currentUser: req.payload });
@@ -134,11 +134,11 @@ router.get("/profile/:userId", authenticateUser, async (req, res) => {
 
     // Fetch the reviews for the user
     const reviews = await Review.find({ user: userId }).populate("user", "username");
-    console.log("Fetched reviews:", reviews);
+    //gn console.log("Fetched reviews:", reviews);
 
     // Filter out reviews with the 'Anonymous' username
     const filteredReviews = reviews.filter(review => review.username !== 'Anonymous');
-    console.log("Filtered reviews:", filteredReviews);
+    //console.log("Filtered reviews:", filteredReviews);
 
     if (filteredReviews.length === 0) {
       return res.status(404).json({ message: "No reviews found" });
