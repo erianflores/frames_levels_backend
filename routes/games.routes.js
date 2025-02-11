@@ -93,6 +93,23 @@ router.get("/search", async (req, res) => {
   }
 });
 
+router.get("/newest", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20;
+
+    const games = await Game.find()
+      .sort({ released: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.json(games);
+  } catch (error) {
+    console.error("Error fetching newest games:", error.message);
+    res.status(500).json({ message: "Error fetching newest games" });
+  }
+});
+
 // Route to fetch details of a single game by ID
 router.get("/:id", async (req, res) => {
   try {

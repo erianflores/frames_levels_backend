@@ -33,7 +33,7 @@ const fetchGames = async (filters) => {
       allGames = [...allGames, ...data.results];
       nextPageUrl = data.next;
 
-      if (allGames.length > 1000) {
+      if (allGames.length > 2000) {
         console.log("Reached limit of 500 games.");
         break;
       }
