@@ -26,9 +26,12 @@ const userSchema = new Schema(
         ref: "Review",
       },
     ],
+    profilePic: 
+    { type: String,
+       default: "" 
+      },
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
   }
 );
