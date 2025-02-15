@@ -111,13 +111,13 @@ router.get("/newest", async (req, res) => {
 });
 
 // Route to fetch details of a single game by ID
-router.get("/:id", async (req, res) => {
+router.get("/one-game/:id", async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
 
-    if (!game) {
-      return res.status(404).json({ message: "Game not found" });
-    }
+    // if (!game) {
+    //   return res.status(500).json({ message: "Game not found" });
+    // }
 
     res.json(game);
   } catch (error) {
