@@ -49,7 +49,11 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ message: "Wrong Credentials " });
     }
 
-    const data = { _id: foundUser._id, username: foundUser.username };
+    const data = {
+      _id: foundUser._id,
+      username: foundUser.username,
+      profilePic: foundUser.profilePic,
+    };
 
     const authToken = jwt.sign(data, process.env.TOKEN_SECRET, {
       algorithm: "HS256",
@@ -73,7 +77,8 @@ router.put("/update", authenticateUser, async (req, res) => {
   try {
     const userId = req.payload._id;
     console.log("User ID from token:", userId);
-    const { email, username, password } = req.body;
+    const { email, username, password, profilePic } = req.body;
+    console.log(profilePic);
 
     const user = await User.findById(userId);
     console.log("User found:", user);
@@ -83,6 +88,7 @@ router.put("/update", authenticateUser, async (req, res) => {
     if (email) user.email = email;
     if (username) user.username = username;
     if (password) user.password = await bcryptjs.hash(password, 10);
+    if (profilePic) user.profilePic = profilePic;
 
     await user.save();
 
@@ -120,9 +126,27 @@ router.delete("/delete", authenticateUser, async (req, res) => {
 
 //verify a user
 router.get("/verify", authenticateUser, async (req, res) => {
-  console.log("verify route", req.payload);
-
-  res.status(200).json({ message: "token is valid", currentUser: req.payload });
+  console.log("verify route hit");
+  try {
+    const user = await User.findById(req.payload._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    console.log(user);
+    res.status(200).json({
+      message: "Token is valid",
+      currentUser: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        profilePic: user.profilePic,
+      },
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error verifying user", error: error.message });
+  }
 });
 
 // Profile route
