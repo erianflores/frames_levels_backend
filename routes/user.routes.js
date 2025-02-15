@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User.model");
+const Game = require("../models/Games.model");
 const Review = require("../models/Reviews.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authenticateUser = require("../middlewares/auth.middleware");
-
 
 //sign up a user
 router.post("/signup", async (req, res) => {
@@ -27,42 +27,41 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-
 //login a user
 router.post("/login", async (req, res) => {
-try {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "Missing email or Password" });
-  }
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Missing email or Password" });
+    }
 
+    const foundUser = await User.findOne({ email });
 
-  const foundUser = await User.findOne({ email });
-  
-  if (!foundUser) {
-   return res.status(403).json({ message: "Invalid Credentials" });
-  } 
+    if (!foundUser) {
+      return res.status(403).json({ message: "Invalid Credentials" });
+    }
 
-  const doesPasswordsMatch = bcryptjs.compareSync( password, foundUser.password);
-   if (!doesPasswordsMatch) {
-      return res.status(403).json({ message: "Wrong Credentials "});
-    } 
-      
+    const doesPasswordsMatch = bcryptjs.compareSync(
+      password,
+      foundUser.password
+    );
+    if (!doesPasswordsMatch) {
+      return res.status(403).json({ message: "Wrong Credentials " });
+    }
+
     const data = { _id: foundUser._id, username: foundUser.username };
 
-
     const authToken = jwt.sign(data, process.env.TOKEN_SECRET, {
-        algorithm: "HS256",
-        expiresIn: "48h",
-      });
+      algorithm: "HS256",
+      expiresIn: "48h",
+    });
 
-      console.log("I found user 2, ", authToken)
-    
-      console.log("Here is the AuthToken", authToken);
+    console.log("I found user 2, ", authToken);
+
+    console.log("Here is the AuthToken", authToken);
     return res.status(200).json({ message: "successful login", authToken });
-
   } catch (error) {
-    console.error("Error logging in user:", error.message); 
+    console.error("Error logging in user:", error.message);
     return res.status(500).json({ message: "Error logging in the user" });
   }
 });
@@ -70,17 +69,15 @@ try {
 // update a user by their ID
 
 router.put("/update", authenticateUser, async (req, res) => {
-  console.log("UPDATE route hit!")
+  console.log("UPDATE route hit!");
   try {
-
     const userId = req.payload._id;
-    console.log("User ID from token:", userId)
+    console.log("User ID from token:", userId);
     const { email, username, password } = req.body;
-    
 
     const user = await User.findById(userId);
     console.log("User found:", user);
-    if(!user) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     if (email) user.email = email;
@@ -91,13 +88,14 @@ router.put("/update", authenticateUser, async (req, res) => {
 
     res.status(200).json({
       message: "User updated successfully",
-      user });
+      user,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// delete a user 
+// delete a user
 
 router.delete("/delete", authenticateUser, async (req, res) => {
   try {
@@ -105,7 +103,7 @@ router.delete("/delete", authenticateUser, async (req, res) => {
     console.log("User ID from token:", userId);
 
     const user = await User.findById(userId);
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -116,15 +114,15 @@ router.delete("/delete", authenticateUser, async (req, res) => {
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user", error.message);
-    res.status(500).json({ message: "Error deleting the user "})
+    res.status(500).json({ message: "Error deleting the user " });
   }
 });
 
 //verify a user
 router.get("/verify", authenticateUser, async (req, res) => {
-   console.log("verify route", req.payload);
+  console.log("verify route", req.payload);
 
-   res.status(200).json({ message: "token is valid", currentUser: req.payload });
+  res.status(200).json({ message: "token is valid", currentUser: req.payload });
 });
 
 // Profile route
@@ -133,11 +131,16 @@ router.get("/profile/:userId", authenticateUser, async (req, res) => {
     const { userId } = req.params;
 
     // Fetch the reviews for the user
-    const reviews = await Review.find({ user: userId }).populate("user", "username");
+    const reviews = await Review.find({ user: userId }).populate(
+      "user",
+      "username"
+    );
     //gn console.log("Fetched reviews:", reviews);
 
     // Filter out reviews with the 'Anonymous' username
-    const filteredReviews = reviews.filter(review => review.username !== 'Anonymous');
+    const filteredReviews = reviews.filter(
+      (review) => review.username !== "Anonymous"
+    );
     //console.log("Filtered reviews:", filteredReviews);
 
     if (filteredReviews.length === 0) {
@@ -146,10 +149,26 @@ router.get("/profile/:userId", authenticateUser, async (req, res) => {
 
     // Return the filtered reviews to the frontend
     res.status(200).json(filteredReviews);
-
   } catch (error) {
     console.error("Error fetching profile:", error.message);
     res.status(500).json({ message: "Error fetching profile data" });
+  }
+});
+
+router.post("/user/:userId/owned", async (req, res) => {
+  const { userId } = req.params;
+  const { gameId } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { ownedGames: gameId } },
+      { new: true }
+    ).populate("ownedGames");
+
+    res.json(user.ownedGames);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

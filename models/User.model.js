@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 const Review = require("./Reviews.model");
 
 // TODO: Please make sure you edit the User model to whatever makes sense in this case
@@ -26,6 +26,8 @@ const userSchema = new Schema(
         ref: "Review",
       },
     ],
+    ownedGames: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
