@@ -26,6 +26,8 @@ const userSchema = new Schema(
         ref: "Review",
       },
     ],
+    ownedGames: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
     profilePic: { type: String, default: "" },
   },
   {

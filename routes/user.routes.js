@@ -179,7 +179,7 @@ router.get("/profile/:userId", authenticateUser, async (req, res) => {
   }
 });
 
-router.post("/user/:userId/owned", async (req, res) => {
+router.post("/:userId/owned", async (req, res) => {
   const { userId } = req.params;
   const { gameId } = req.body;
 
@@ -189,6 +189,26 @@ router.post("/user/:userId/owned", async (req, res) => {
       { $addToSet: { ownedGames: gameId } },
       { new: true }
     ).populate("ownedGames");
+
+    res.json(user.ownedGames);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/:userId/owned", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: "Invalid userId" });
+  }
+
+  try {
+    const user = await User.findById(userId).populate("ownedGames");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     res.json(user.ownedGames);
   } catch (error) {

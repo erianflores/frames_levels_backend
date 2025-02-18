@@ -2,7 +2,6 @@ const authRoutes = require("./routes/user.routes");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-
 // ℹ️ Gets access to environment variables/settings
 // https://www.npmjs.com/package/dotenv
 require("dotenv").config();
@@ -17,7 +16,7 @@ const express = require("express");
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 // ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
 require("./config")(app);
@@ -30,7 +29,7 @@ const userRoutes = require("./routes/user.routes");
 
 app.use("/api/games", gamesRoutes);
 app.use("/api/index", indexRoutes);
-console.log("userRoutes loaded!")
+console.log("userRoutes loaded!");
 app.use("/users", userRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/auth", authRoutes);
