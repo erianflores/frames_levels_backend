@@ -6,6 +6,7 @@ const Review = require("../models/Reviews.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authenticateUser = require("../middlewares/auth.middleware");
+const mongoose = require("mongoose");
 
 //sign up a user
 router.post("/signup", async (req, res) => {
