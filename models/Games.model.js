@@ -29,6 +29,7 @@ const gameSchema = new Schema({
   ratings: { type: Object },
   ratings_count: { type: Number },
   reviews_text_count: { type: String },
+  genres: [{ id: Number, name: String, slug: String }],
   added: { type: Number },
   added_by_status: { type: Object },
   metacritic: { type: Number },

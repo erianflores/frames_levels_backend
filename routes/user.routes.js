@@ -179,6 +179,7 @@ router.get("/profile/:userId", authenticateUser, async (req, res) => {
   }
 });
 
+//User owned and wishlist routes
 router.post("/:userId/owned", async (req, res) => {
   const { userId } = req.params;
   const { gameId } = req.body;
@@ -211,6 +212,43 @@ router.get("/:userId/owned", async (req, res) => {
     }
 
     res.json(user.ownedGames);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/:userId/wishlist", async (req, res) => {
+  const { userId } = req.params;
+  const { gameId } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { wishlist: gameId } },
+      { new: true }
+    ).populate("wishlist");
+
+    res.json(user.ownedGames);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/:userId/wishlist", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: "Invalid userId" });
+  }
+
+  try {
+    const user = await User.findById(userId).populate("wishlist");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user.wishlist);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

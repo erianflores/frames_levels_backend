@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const axios = require("axios");
 const Game = require("../models/Games.model");
 
@@ -9,6 +8,7 @@ const fetchGames = async (filters) => {
   try {
     let allGames = [];
     let nextPageUrl = `${BASE_URL}/games?key=${API_KEY}`;
+
     if (filters) {
       const query = new URLSearchParams({
         key: API_KEY,
@@ -23,24 +23,19 @@ const fetchGames = async (filters) => {
 
     while (nextPageUrl) {
       console.log("Fetching URL:", nextPageUrl);
-      const response = await fetch(nextPageUrl);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const { data } = await axios.get(nextPageUrl);
 
-      const data = await response.json();
       allGames = [...allGames, ...data.results];
       nextPageUrl = data.next;
 
-      if (allGames.length > 2000) {
+      if (allGames.length > 4000) {
         console.log("Reached limit of 500 games.");
         break;
       }
     }
 
-    //Insert fetched games into the database
-
+    // Insert fetched games into the database
     for (let gameData of allGames) {
       const existingGame = await Game.findOne({ id: gameData.id });
 
