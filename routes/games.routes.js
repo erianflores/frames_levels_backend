@@ -45,7 +45,7 @@ router.get("/featured", async (req, res) => {
 router.get("/top-games", async (req, res) => {
   console.log("Fetching top-rated games with IDs:");
   try {
-    const topRatedGameIds = [3328, 5286, 12020, 5679];
+    const topRatedGameIds = [481913, 50734, 3328, 5286, 12020, 5679];
     let topGames = [];
 
     console.log("Fetching top-rated games with IDs:", topRatedGameIds);

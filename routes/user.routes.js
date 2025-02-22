@@ -218,6 +218,42 @@ router.get("/:userId/owned", async (req, res) => {
   }
 });
 
+router.delete("/:userId/owned/:gameId", async (req, res) => {
+  const { userId, gameId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.ownedGames) {
+      return res.status(400).json({ message: "User has no owned games" });
+    }
+
+    if (!Array.isArray(user.ownedGames)) {
+      return res.status(400).json({ message: "Owned games is not an array" });
+    }
+
+    const gameIndex = user.ownedGames.findIndex(
+      (game) => game.toString() === gameId
+    );
+
+    if (gameIndex === -1) {
+      return res.status(400).json({ message: "Game not found in owned list" });
+    }
+
+    user.ownedGames.splice(gameIndex, 1);
+    await user.save();
+
+    res.status(200).json({ message: "Game removed from owned list" });
+  } catch (error) {
+    console.error("Error removing game from owned list:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/:userId/wishlist", async (req, res) => {
   const { userId } = req.params;
   const { gameId } = req.body;
